@@ -1,0 +1,34 @@
+# # basic
+# epoch : 300
+# batch_size : 1
+# optim : LBFGS
+# model : lenet
+
+# # epoch
+# epoch : 100
+# batch_size : 1
+# optim : LBFGS
+# model : lenet
+
+
+# batch
+epoch : 300
+batch_size : 1
+optim : LBFGS
+model : lenet
+
+
+# # optim
+# epoch : 300
+# batch_size : 1
+# optim : SGD
+# model : lenet
+
+
+##############################
+
+Noise_level : 0
+
+##############################
+
+has_label : True
