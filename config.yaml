@@ -1,34 +1,211 @@
-# # basic
-# epoch : 300
-# batch_size : 1
-# optim : LBFGS
-# model : lenet
+org : 
+  idx :  245
+  epoch : 300
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
+#############################
+epoch_100: 
+  idx :  245
+  epoch : 100
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
 
-# # epoch
-# epoch : 100
-# batch_size : 1
-# optim : LBFGS
-# model : lenet
+epoch_200: 
+  idx :  245
+  epoch : 200
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
+
+epoch_400: 
+  idx :  245
+  epoch : 200
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
+#############################
+batch_2 : 
+  idx :  245
+  epoch : 300
+  noise_level : 0
+  batch_size : 2
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
+
+batch_4 : 
+  idx : 245
+  epoch : 300
+  noise_level : 0
+  batch_size : 4
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
 
 
-# batch
-epoch : 300
-batch_size : 1
-optim : LBFGS
-model : lenet
+batch_8 : 
+  idx : 245
+  epoch : 300
+  noise_level : 0
+  batch_size : 8
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
 
+batch_16 : 
+  idx : 245
+  epoch : 300
+  noise_level : 0
+  batch_size : 16
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
+#############################
+optim_Adam : 
+  idx :  245
+  epoch : 300
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : Adam
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
 
-# # optim
-# epoch : 300
-# batch_size : 1
-# optim : SGD
-# model : lenet
+optim_AdamW : 
+  idx :  245
+  epoch : 300
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : AdamW
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
 
+optim_SGD : 
+  idx :  245
+  epoch : 300
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : SGD
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
+##############################
+noise_1 : 
+  idx :  245
+  epoch : 300
+  noise_level : 1
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
+
+noise_2 : 
+  idx :  245
+  epoch : 300
+  noise_level : 2
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
+
+noise_3 : 
+  idx :  245
+  epoch : 300
+  noise_level : 3
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float32
+  global_precision : float32
 
 ##############################
 
-Noise_level : 0
+no_label : 
+  idx :  245
+  epoch : 300
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : False
+  local_precision : float32
+  global_precision : float32
+
 
 ##############################
+quant_64_64 : 
+  idx :  245
+  epoch : 300
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float64
+  global_precision : float64
 
-has_label : True
+
+quant_16_16 : 
+  idx :  245
+  epoch : 300
+  noise_level : 0
+  batch_size : 1
+  dataset : CIFAR100
+  optim : LBFGS
+  model : lenet
+  has_label : True
+  local_precision : float16
+  global_precision : float16
+
+

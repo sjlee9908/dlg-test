@@ -14,106 +14,89 @@ import torchvision
 from torchvision import models, datasets, transforms
 import yaml
 
+from dlg.run_dlg import run_dlg
+
 print(torch.__version__, torchvision.__version__)
 
 from utils import *
 
-def main(config, args):
+def main(config, scen):
+    pprint(config)
     # init
-    torch.manual_seed(1234)
-    tt = transforms.ToPILImage()
     dst = datasets.CIFAR100("./data/torch", download=True)
     device = set_device()
     criterion = cross_entropy_for_onehot
 
     # load config
-    img_index = args.index
-    batch_size = config['batch_size']
-    epoch = config['epoch']
+    img_index = config['idx']
 
     # load data    
-    gt_data, gt_label, gt_onehot_label = make_batched_input(dst, batch_size, img_index)
+    gt_data, gt_label, gt_onehot_label = make_batched_input(dst, config["local_precision"], config['batch_size'], img_index)
     gt_data = gt_data.to(device)
     gt_label = gt_label.to(device)
     gt_onehot_label = gt_onehot_label.to(device)
 
     # create model
-    net = get_model(config['model'], device)
+    net = get_model(config['model'], config["local_precision"], device)
 
     # compute original gradient 
     pred = net(gt_data)
     y = criterion(pred, gt_onehot_label)
     dy_dx = torch.autograd.grad(y, net.parameters())
-    original_dy_dx = list((_.detach().clone() for _ in dy_dx))
-
-    # generate dummy data and label
-    dummy_data = torch.randn(gt_data.size()).to(device).requires_grad_(True)
-    dummy_label = torch.randn(gt_onehot_label.size()).to(device).requires_grad_(True)
     
-    init_dummy_data = dummy_data.detach().clone()
-
-    
-    # create optim
-    optimizer = get_optim(config['optim'], dummy_data, dummy_label)
-
-    for iters in range(epoch):
-        def closure():
-            optimizer.zero_grad()
-
-            #dummy forward
-            dummy_pred = net(dummy_data) 
-            dummy_onehot_label = F.softmax(dummy_label, dim=-1)
-            dummy_loss = criterion(dummy_pred, dummy_onehot_label) 
-            dummy_dy_dx = torch.autograd.grad(dummy_loss, net.parameters(), create_graph=True)
-            
-            # dummy backward, model backward
-            # dummy_dy_dx가 origin_dy_dx와 비슷해지는 방향으로 step하도록함
-            grad_diff = 0
-            for gx, gy in zip(dummy_dy_dx, original_dy_dx): 
-                grad_diff += ((gx - gy) ** 2).sum()
-            grad_diff.backward()
-            
-            return grad_diff
+    if config['noise_level'] != 0:
+        noise_ratio = config['noise_level'] * 0.1
         
-        #dummy_dy_dx가 origin_dy_dx와 비슷해지는 방향으로 step / dummy_data, dummy_label에 대해 step
-        optimizer.step(closure)
-        if iters % 10 == 0: 
-            current_loss = closure()
-            print(iters, "%.4f" % current_loss.item())
+        noisy_dy_dx = []
+        for g in dy_dx:
+            noise_scale = g.mean() * noise_ratio
+            noise = torch.randn_like(g) * noise_scale
+            noisy_dy_dx.append(g + noise)
+            
+        dy_dx = tuple(noisy_dy_dx)
 
-    #show
-    plt.figure(figsize=(2 * batch_size, 6))
+    original_dy_dx = list((_.detach().clone() for _ in dy_dx))
+    if config['global_precision'] == "float64":
+        original_dy_dx = [g.double() for g in original_dy_dx]
+    elif config['global_precision'] == "float16":
+        original_dy_dx = [g.half() for g in original_dy_dx]
+    else:
+        original_dy_dx = [g.float() for g in original_dy_dx]
     
-    for i in range(batch_size):
-        plt.subplot(3, batch_size, i + 1)
-        plt.imshow(tt(gt_data[i].cpu()))
-        plt.axis('off')
-        if i == 0: plt.title("Original")
 
-        plt.subplot(3, batch_size, batch_size + i + 1)
-        plt.imshow(tt(init_dummy_data[i].cpu()))
-        plt.axis('off')
-        if i == 0: plt.title("Initial")
+    init_dummy_data, dummy_data = run_dlg(
+        gt_data = gt_data, 
+        gt_onehot_label = gt_onehot_label, 
+        org_dx_dy = original_dy_dx, 
+        device = device, 
+        optim = config["optim"],
+        net = net, 
+        criterion = criterion, 
+        epoch = config["epoch"],
+        global_precision=config['global_precision']
+        )
+    
+    sim = perceptual_similarity(gt_data, dummy_data, device)
+    with open(f"./result/{scen}_{img_index}.txt", "a") as f:
+        f.write(f"cosine sim : {sim}\n")  # 끝에 \n을 붙여야 줄바꿈이 됩니다.
+    save_plot(f"./result/{scen}_{img_index}.png", config['batch_size'], gt_data, init_dummy_data, dummy_data)
 
-        plt.subplot(3, batch_size, 2 * batch_size + i + 1)
-        plt.imshow(tt(dummy_data[i].detach().cpu()))
-        plt.axis('off')
-        if i == 0: plt.title("Final")
 
-    plt.tight_layout()
-    plt.show()
+
+
 
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Deep Leakage from Gradients.')
-    parser.add_argument('--index', type=int, default=400,
-                        help='the index for leaking images on CIFAR.')
     parser.add_argument('--config', type=str, default="./config.yaml",
                         help='the path to yaml config file.')
+    parser.add_argument('--scenario', type=str, default="org",
+                        help='scenario to run')
     args = parser.parse_args()
 
+    torch.manual_seed(1234)
 
     with open(args.config) as f:
         config = yaml.load(f, Loader=yaml.SafeLoader)
 
-    main(config, args)
+    main(config[args.scenario], args.scenario)

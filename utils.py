@@ -34,7 +34,7 @@ def set_device():
     return device
 
 
-def make_batched_input(dataset, batch_size, start_idx):
+def make_batched_input(dataset, precision, batch_size, start_idx):
     tp = transforms.ToTensor()
 
     gt_data_list = []
@@ -50,77 +50,107 @@ def make_batched_input(dataset, batch_size, start_idx):
     gt_label = torch.stack(gt_label_list).long()
     gt_onehot_label = label_to_onehot(gt_label, num_classes=100)
 
+    if precision == 'float64':
+        gt_data = gt_data.double()
+        gt_onehot_label = gt_onehot_label.double()
+    elif precision == 'float16':
+        gt_data = gt_data.half()
+        gt_onehot_label = gt_onehot_label.half()
+
     return gt_data, gt_label, gt_onehot_label
 
 
-def get_model(model, device):
-        
+def get_model(model, precision, device):
     # create, init global model
     if model == "lenet":
         from models.lenet import LeNet, weights_init
         net = LeNet().to(device)
         net.apply(weights_init)
-    elif model == 'resnet18':
-        from models.resnet import resnet18, weights_init
-        net = resnet18().to(device)
-        net.apply(weights_init)
-    elif model == 'resnet34':
-        from models.resnet import resnet34, weights_init
-        net = resnet34().to(device)
-        net.apply(weights_init)
-    elif model == 'resnet50':
-        from models.resnet import resnet101, weights_init
-        net = resnet101().to(device)
-        net.apply(weights_init)
-    elif model == 'resnet101':
-        from models.resnet import resnet152, weights_init
-        net = resnet152().to(device)
-        net.apply(weights_init)
-    elif model == 'resnet152':
-        from models.resnet import resnet152, weights_init
-        net = resnet152().to(device)
-        net.apply(weights_init)
     
+    if precision == "float16":
+        net.half()  # 모델 전체를 float16으로 변환
+    elif precision == "float64":
+        net.double() 
+
     return net
 
-def get_optim(optim, dummy_data, dummy_label):
-    lr = 1
-    params = [dummy_data, dummy_label]
 
-    if optim == "LBFGS":
-        optimizer = torch.optim.LBFGS(params)
-        
-    elif optim == "AdamW":
-        optimizer = torch.optim.AdamW(params, lr=lr)
-        
-    elif optim == "Adam":
-        optimizer = torch.optim.Adam(params, lr=lr)
-        
-    elif optim == "SGD":
-        optimizer = torch.optim.SGD(params, lr=lr, momentum=0.9)
-        
-    elif optim == "RMSprop":
-        optimizer = torch.optim.RMSprop(params, lr=lr)
-        
-    elif optim == "Adadelta":
-        optimizer = torch.optim.Adadelta(params, lr=lr)
-        
-    elif optim == "Adagrad":
-        optimizer = torch.optim.Adagrad(params, lr=lr)
-        
-    elif optim == "Adamax":
-        optimizer = torch.optim.Adamax(params, lr=lr)
-        
-    elif optim == "NAdam":
-        optimizer = torch.optim.NAdam(params, lr=lr)
-        
-    elif optim == "RAdam":
-        optimizer = torch.optim.RAdam(params, lr=lr)
-        
-    else:
-        raise ValueError(f"Unknown optimizer: {optim}")
+import os
+import matplotlib.pyplot as plt
+from torchvision import transforms
+
+def save_plot(save_path, batch_size, gt_data, init_dummy_data, dummy_data):
+    """
+    입력받은 save_path(경로+파일명)에 이미지를 저장합니다.
+    경로상의 폴더가 없다면 자동으로 생성합니다.
+    """
     
-    return optimizer
+    # 1. 경로(Folder) 확인 및 생성 로직
+    # 파일 경로에서 디렉토리 부분만 추출 (예: 'result/data/img.png' -> 'result/data')
+    dir_name = os.path.dirname(save_path) 
+    
+    # 디렉토리가 명시되어 있고, 실제로 존재하지 않는다면 생성
+    if dir_name and not os.path.exists(dir_name):
+        os.makedirs(dir_name, exist_ok=True) # exist_ok=True: 이미 있어도 에러 안 남
+        print(f"Directory created: {dir_name}")
+
+    # 2. 기존 Plotting 로직
+    tt = transforms.ToPILImage()
+    plt.figure(figsize=(2 * batch_size, 6))
+    
+    for i in range(batch_size):
+        # Original
+        plt.subplot(3, batch_size, i + 1)
+        plt.imshow(tt(gt_data[i].cpu()))
+        plt.axis('off')
+        if i == 0: plt.title("Original")
+
+        # Initial
+        plt.subplot(3, batch_size, batch_size + i + 1)
+        plt.imshow(tt(init_dummy_data[i].cpu()))
+        plt.axis('off')
+        if i == 0: plt.title("Initial")
+
+        # Final
+        plt.subplot(3, batch_size, 2 * batch_size + i + 1)
+        plt.imshow(tt(dummy_data[i].detach().cpu()))
+        plt.axis('off')
+        if i == 0: plt.title("Final")
+
+    plt.tight_layout()
+    
+    # 3. 저장 (show 대신 savefig 사용)
+    plt.savefig(save_path)
+    plt.close() # 메모리 해제
+    print(f"Saved image to: {save_path}")
 
 
-# def ceptual_cos_sim():
+def perceptual_similarity(gt_data, dlg_data, device):
+    import torch
+    import torch.nn as nn
+    import torch.nn.functional as F
+    from torchvision import models
+
+    def infer(data):
+        data = data.float()
+        
+        mean = torch.tensor([0.485, 0.456, 0.406]).view(1, 3, 1, 1).to(device)
+        std = torch.tensor([0.229, 0.224, 0.225]).view(1, 3, 1, 1).to(device)
+        upsampled = F.interpolate(data, size=(224, 224), mode='bilinear', align_corners=False)
+        normalized = (upsampled - mean) / std
+        
+        return vgg(normalized)
+
+    vgg = models.vgg16(weights=models.VGG16_Weights.DEFAULT)
+    vgg.classifier = nn.Sequential(*list(vgg.classifier.children())[:-1])
+    vgg.to(device)
+    vgg.eval()
+
+    gt_data = gt_data
+    with torch.no_grad():
+        gt_vector = infer(gt_data)
+        dlg_vector = infer(dlg_data)
+        per_sample_sim = F.cosine_similarity(gt_vector, dlg_vector, dim=1)
+        final_score = per_sample_sim.mean().item()
+
+    return final_score
