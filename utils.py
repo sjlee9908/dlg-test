@@ -61,6 +61,21 @@ def get_model(model, device):
         from models.lenet import LeNet, weights_init
         net = LeNet().to(device)
         net.apply(weights_init)
+    
+    elif model == "resnet":
+        from models.resnet import resnet18, weights_init
+        net = resnet18().to(device)
+        net.apply(weights_init)
+    
+    elif model == "vggnet":
+        from models.vgg import vgg11_bn, weights_init
+        net = vgg11_bn().to(device)
+        net.apply(weights_init)
+    
+    elif model == "ffn":
+        from models.ffn import FFN, weights_init
+        net = FFN().to(device)
+        net.apply(weights_init)
 
     return net
 

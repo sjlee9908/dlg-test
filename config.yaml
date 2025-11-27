@@ -1,217 +1,346 @@
+# org 기준 잘되는 거 2936, 3845
 org :
   model : lenet
   data : 
     dataset : CIFAR100
     batch_size : 1
-    idx :  245
+    idx : 3845 #  73233
   dlg:
     iter : 300
-    lr : 1e-4
+    lr : 1
     optim : LBFGS
     precision : float32
-    has_label : True
+    has_label : False
   client:
     epoch : 300
     noise_level : 0
     precision : float32
-  
-# #############################
-# epoch_100: 
-#   idx :  245
-#   epoch : 100
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+#############################
+vggnet :
+  model : vggnet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 #  73233
+  dlg:
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client:
+    epoch : 300
+    noise_level : 0
+    precision : float32
 
-# epoch_200: 
-#   idx :  245
-#   epoch : 200
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+resnet :
+  model : resnet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 #  73233
+  dlg:
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client:
+    epoch : 300
+    noise_level : 0
+    precision : float32
 
-# epoch_400: 
-#   idx :  245
-#   epoch : 200
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
-# #############################
-# batch_2 : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 2
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+ffn :
+  model : ffn
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 1111 #  73233
+  dlg:
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client:
+    epoch : 300
+    noise_level : 0
+    precision : float32
 
-# batch_4 : 
-#   idx : 245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 4
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+#############################
+batch_2 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 2
+    idx : 3845 # 245
+  dlg: 
+    iter : 600
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
+batch_4 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 4
+    idx : 3845 # 245
+  dlg: 
+    iter : 600
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
-# batch_8 : 
-#   idx : 245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 8
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+batch_8 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 8
+    idx : 3845 # 245
+  dlg: 
+    iter : 600
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
-# batch_16 : 
-#   idx : 245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 16
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
-# #############################
-# optim_Adam : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : Adam
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+batch_16 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 16
+    idx : 3845 # 245
+  dlg: 
+    iter : 600
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
-# optim_AdamW : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : AdamW
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+#############################
+optim_Adam : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 50000
+    lr : 1e-2
+    optim : Adam
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
-# optim_SGD : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : SGD
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
-# ##############################
-# noise_1 : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 1
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+optim_AdamW : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 6243
+  dlg: 
+    iter : 50000
+    lr : 1e-2
+    optim : AdamW
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
-# noise_2 : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 2
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+optim_SGD : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 50000
+    lr : 1e-2
+    optim : SGD
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
-# noise_3 : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 3
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float32
-#   global_precision : float32
+##############################
+noise_1 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 1
+    precision : float32
 
-# ##############################
+noise_2 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 2
+    precision : float32
 
-# no_label : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : False
-#   local_precision : float32
-#   global_precision : float32
+noise_3 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 3
+    precision : float32
 
+##############################
+have_label : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : True
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
-# ##############################
-# quant_64_64 : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float64
-#   global_precision : float64
+##############################
+quant_64_64 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float64
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float64
 
+quant_16_16 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 300
+    lr : 1
+    optim : LBFGS
+    precision : float16
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float16
 
-# quant_16_16 : 
-#   idx :  245
-#   epoch : 300
-#   noise_level : 0
-#   batch_size : 1
-#   dataset : CIFAR100
-#   optim : LBFGS
-#   model : lenet
-#   has_label : True
-#   local_precision : float16
-#   global_precision : float16
+#################################
+iter_100 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 100
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
+iter_200 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 200
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32
 
+iter_400 : 
+  model : lenet
+  data : 
+    dataset : CIFAR100
+    batch_size : 1
+    idx : 3845 # 245
+  dlg: 
+    iter : 400
+    lr : 1
+    optim : LBFGS
+    precision : float32
+    has_label : False
+  client: 
+    epoch : 1
+    noise_level : 0
+    precision : float32

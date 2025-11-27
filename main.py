@@ -35,7 +35,7 @@ def main(config, scen):
     client = ClientRunner(net, config.client)
     attacker = DLGRunner(
                     gt_data_size=gt_data.size(),
-                    gt_onehot_label_size=gt_onehot_label.size(),
+                    gt_onehot_label=gt_onehot_label,
                     device=device,
                     config = config.dlg)
     
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Deep Leakage from Gradients.')
     parser.add_argument('--config', type=str, default="./config.yaml",
                         help='the path to yaml config file.')
-    parser.add_argument('--scenario', type=str, default="org",
+    parser.add_argument('--scenario', type=str, default="iter_400",
                         help='scenario to run')
     args = parser.parse_args()
 

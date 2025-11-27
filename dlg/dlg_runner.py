@@ -1,36 +1,23 @@
-# -*- coding: utf-8 -*-
-import argparse
-import numpy as np
-from pprint import pprint
-
-from PIL import Image
-import matplotlib.pyplot as plt
-
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-from torch.autograd import grad
-import torchvision
-from torchvision import models, datasets, transforms
-import yaml
-
-
 class DLGRunner():
-    def __init__(self, gt_data_size, gt_onehot_label_size, device, config):
+    def __init__(self, gt_data_size, gt_onehot_label, device, config):
         self.dummy_data = torch.randn(gt_data_size).to(device)
-        self.dummy_label = torch.randn(gt_onehot_label_size).to(device)
+        self.dummy_label = torch.randn(gt_onehot_label.size()).to(device)
+        self.true_label = gt_onehot_label
+        self.has_label = config.has_label
         self.init_dummy_data = self.dummy_data.detach().clone()
 
         self.lr = config.lr
         self.device = device
         self.precision = config.precision
         self.iter = config.iter
-
-        self.optim = self._get_optim(config.optim)
-    
+        self.optim_name = config.optim
 
     def run_dlg(self, org_dx_dy, net, criterion):
-        #pricision convert
+        if self.has_label == True:
+            self.dummy_label = self.true_label.detach().clone().to(self.device)
+
         if self.precision == "float64":
             org_dx_dy = [g.double() for g in org_dx_dy]
             self.dummy_data = self.dummy_data.double()
@@ -46,21 +33,25 @@ class DLGRunner():
             net = net.float()
         
         self.dummy_data.requires_grad_(True)
-        self.dummy_label.requires_grad_(True)
+        
+        if self.has_label:
+            self.dummy_label.requires_grad_(False)
+            client_params = [self.dummy_data]
+        else:
+            self.dummy_label.requires_grad_(True)
+            client_params = [self.dummy_data, self.dummy_label]
 
-        #dlg
+        self.optim = self._get_optim(client_params, self.optim_name)
+
         for iters in range(self.iter):
             def closure():
                 self.optim.zero_grad()
 
-                #dummy forward
                 dummy_pred = net(self.dummy_data) 
                 dummy_onehot_label = F.softmax(self.dummy_label, dim=-1)
                 dummy_loss = criterion(dummy_pred, dummy_onehot_label) 
                 dummy_dy_dx = torch.autograd.grad(dummy_loss, net.parameters(), create_graph=True)
                 
-                # dummy backward, model backward
-                # dummy_dy_dx가 origin_dy_dx와 비슷해지는 방향으로 step하도록함
                 grad_diff = 0
                 for gx, gy in zip(dummy_dy_dx, org_dx_dy): 
                     grad_diff += ((gx - gy) ** 2).sum()
@@ -68,7 +59,6 @@ class DLGRunner():
                 
                 return grad_diff
             
-            #dummy_dy_dx가 origin_dy_dx와 비슷해지는 방향으로 step / dummy_data, dummy_label에 대해 step
             self.optim.step(closure)
             if iters % 10 == 0: 
                 current_loss = closure()
@@ -76,10 +66,7 @@ class DLGRunner():
 
         return self.init_dummy_data, self.dummy_data
 
-    
-    def _get_optim(self, optim):
-        params = [self.dummy_data, self.dummy_label]
-
+    def _get_optim(self, params, optim):
         if optim == "LBFGS": return torch.optim.LBFGS(params)        
         elif optim == "AdamW":  return torch.optim.AdamW(params, lr=self.lr)        
         elif optim == "Adam": return torch.optim.Adam(params, lr=self.lr)        
@@ -91,6 +78,3 @@ class DLGRunner():
         elif optim == "NAdam": return torch.optim.NAdam(params, lr=self.lr)        
         elif optim == "RAdam": return torch.optim.RAdam(params, lr=self.lr)
         else: raise ValueError(f"Unknown optimizer: {optim}")
-
-        
-        
