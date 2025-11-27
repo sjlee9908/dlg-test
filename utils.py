@@ -34,7 +34,9 @@ def set_device():
     return device
 
 
-def make_batched_input(dataset, precision, batch_size, start_idx):
+def make_batched_input(dataset, config, device):
+    batch_size = config.batch_size
+    start_idx = config.idx
     tp = transforms.ToTensor()
 
     gt_data_list = []
@@ -50,27 +52,15 @@ def make_batched_input(dataset, precision, batch_size, start_idx):
     gt_label = torch.stack(gt_label_list).long()
     gt_onehot_label = label_to_onehot(gt_label, num_classes=100)
 
-    if precision == 'float64':
-        gt_data = gt_data.double()
-        gt_onehot_label = gt_onehot_label.double()
-    elif precision == 'float16':
-        gt_data = gt_data.half()
-        gt_onehot_label = gt_onehot_label.half()
-
-    return gt_data, gt_label, gt_onehot_label
+    return gt_data.to(device), gt_label.to(device), gt_onehot_label.to(device)
 
 
-def get_model(model, precision, device):
+def get_model(model, device):
     # create, init global model
     if model == "lenet":
         from models.lenet import LeNet, weights_init
         net = LeNet().to(device)
         net.apply(weights_init)
-    
-    if precision == "float16":
-        net.half()  # 모델 전체를 float16으로 변환
-    elif precision == "float64":
-        net.double() 
 
     return net
 
