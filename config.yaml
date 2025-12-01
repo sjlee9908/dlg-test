@@ -55,7 +55,7 @@ ffn :
   data : 
     dataset : CIFAR100
     batch_size : 1
-    idx : 1111 #  73233
+    idx : 3845 #  73233
   dlg:
     iter : 300
     lr : 1
