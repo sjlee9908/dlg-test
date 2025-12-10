@@ -205,7 +205,6 @@ noise_1 :
     epoch : 1
     noise_level : 1
     precision : float32
-
 noise_2 : 
   model : lenet
   data : 

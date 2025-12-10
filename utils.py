@@ -87,46 +87,50 @@ from torchvision import transforms
 def save_plot(save_path, batch_size, gt_data, init_dummy_data, dummy_data):
     """
     입력받은 save_path(경로+파일명)에 이미지를 저장합니다.
-    경로상의 폴더가 없다면 자동으로 생성합니다.
+    구조 변경: (Original, Initial, Final)을 가로로 나란히 배치
     """
     
-    # 1. 경로(Folder) 확인 및 생성 로직
-    # 파일 경로에서 디렉토리 부분만 추출 (예: 'result/data/img.png' -> 'result/data')
+    # 1. 경로(Folder) 확인 및 생성
     dir_name = os.path.dirname(save_path) 
-    
-    # 디렉토리가 명시되어 있고, 실제로 존재하지 않는다면 생성
     if dir_name and not os.path.exists(dir_name):
-        os.makedirs(dir_name, exist_ok=True) # exist_ok=True: 이미 있어도 에러 안 남
+        os.makedirs(dir_name, exist_ok=True)
         print(f"Directory created: {dir_name}")
 
-    # 2. 기존 Plotting 로직
+    # 2. Plotting 로직 (가로 배치로 수정됨)
     tt = transforms.ToPILImage()
-    plt.figure(figsize=(2 * batch_size, 6))
+    
+    # figsize 수정: 가로 폭은 고정(3개 이미지), 세로 길이는 batch_size에 비례
+    # 예: 이미지 하나당 3x3인치라고 가정하면 가로 9, 세로 3*batch_size
+    plt.figure(figsize=(9, 3 * batch_size))
     
     for i in range(batch_size):
-        # Original
-        plt.subplot(3, batch_size, i + 1)
+        # --- Original (좌측) ---
+        # 전체 행: batch_size, 전체 열: 3
+        # 위치: 현재 행(i)의 첫 번째 칸 -> 3*i + 1
+        plt.subplot(batch_size, 3, 3 * i + 1)
         plt.imshow(tt(gt_data[i].cpu()))
         plt.axis('off')
-        if i == 0: plt.title("Original")
+        if i == 0: plt.title("Original") # 맨 윗줄에만 타이틀 표시
 
-        # Initial
-        plt.subplot(3, batch_size, batch_size + i + 1)
+        # --- Initial (중앙) ---
+        # 위치: 현재 행(i)의 두 번째 칸 -> 3*i + 2
+        plt.subplot(batch_size, 3, 3 * i + 2)
         plt.imshow(tt(init_dummy_data[i].cpu()))
         plt.axis('off')
         if i == 0: plt.title("Initial")
 
-        # Final
-        plt.subplot(3, batch_size, 2 * batch_size + i + 1)
+        # --- Final (우측) ---
+        # 위치: 현재 행(i)의 세 번째 칸 -> 3*i + 3
+        plt.subplot(batch_size, 3, 3 * i + 3)
         plt.imshow(tt(dummy_data[i].detach().cpu()))
         plt.axis('off')
         if i == 0: plt.title("Final")
 
     plt.tight_layout()
     
-    # 3. 저장 (show 대신 savefig 사용)
+    # 3. 저장
     plt.savefig(save_path)
-    plt.close() # 메모리 해제
+    plt.close()
     print(f"Saved image to: {save_path}")
 
 
