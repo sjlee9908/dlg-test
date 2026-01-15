@@ -1,4 +1,5 @@
-Deep Leakage from Gradients (DLG) PyTorch Implementation
+### Deep Leakage from Gradients (DLG) PyTorch Implementation
+
 이 저장소는 Deep Leakage from Gradients (DLG) 논문의 아이디어를 PyTorch로 구현한 프로젝트입니다. Federated Learning과 같이 Gradient만 공유되는 환경에서, Gradient를 역공학하여 원본 이미지와 라벨을 복원하는 공격 및 방어 실험을 수행할 수 있습니다.
 
 ✨ Features
